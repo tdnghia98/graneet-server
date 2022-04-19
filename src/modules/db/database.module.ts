@@ -12,6 +12,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
+        url: configService.get<string>('DATABASE_URL'),
         type: 'postgres',
         host: configService.get<string>('DATABASE_HOST'),
         port: parseInt(configService.get<string>('DATABASE_PORT')),
@@ -21,7 +22,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         entities: ['dist/**/*.entity{.ts,.js}'],
         migrations: ['dist/src/migration/**/*{.ts,.js}'],
         subscribers: ['dist/src/subscriber/**/*{.ts,.js}'],
-        synchronize: true,
+        synchronize: configService.get<string>('NODE_ENV') === 'development',
+        extra: {
+          ssl: {
+            rejectUnauthorized:
+              configService.get<string>('NODE_ENV') !== 'production',
+          },
+        },
       }),
     }),
   ],
