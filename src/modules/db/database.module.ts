@@ -18,16 +18,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         port: parseInt(configService.get<string>('DATABASE_PORT')),
         username: configService.get<string>('DATABASE_USERNAME'),
         password: configService.get<string>('DATABASE_PASSWORD'),
-        name: configService.get<string>('DATABASE_NAME'),
+        database: configService.get<string>('DATABASE_NAME'),
         entities: ['dist/**/*.entity{.ts,.js}'],
         migrations: ['dist/src/migration/**/*{.ts,.js}'],
         subscribers: ['dist/src/subscriber/**/*{.ts,.js}'],
         synchronize: configService.get<string>('NODE_ENV') === 'development',
         extra: {
-          ssl: {
-            rejectUnauthorized:
-              configService.get<string>('NODE_ENV') !== 'production',
-          },
+          ssl: process.env.DATABASE_URL ? true : false,
         },
       }),
     }),
